@@ -1,3 +1,7 @@
+from utils.replay_buffer import ReplayBuffer
+from utils.actor import Actor
+from utils.critic import Critic
+
 class DDPG():
     """Reinforcement Learning agent that learns using DDPG."""
     def __init__(self, task):
