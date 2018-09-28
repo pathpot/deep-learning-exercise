@@ -1,6 +1,8 @@
+import numpy as np
 from utils.replay_buffer import ReplayBuffer
 from utils.actor import Actor
 from utils.critic import Critic
+from utils.ou_noise import OUNoise
 
 class DDPG():
     """Reinforcement Learning agent that learns using DDPG."""
