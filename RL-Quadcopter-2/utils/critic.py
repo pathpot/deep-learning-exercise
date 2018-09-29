@@ -16,6 +16,7 @@ class Critic:
         self.action_size = action_size
 
         # Initialize any other variables here
+        self.learning_rate = 0.001
 
         self.build_model()
 
@@ -40,6 +41,14 @@ class Critic:
         net = layers.Activation('relu')(net)
 
         # Add more layers to the combined network if needed
+        net = layers.Dense(units=400)(net)
+        net = layers.LeakyReLU(alpha=0.2)(net)
+        
+        net = layers.Dense(units=300)(net)
+        net = layers.LeakyReLU(alpha=0.2)(net)
+        net = layers.normalization.BatchNormalization()(net)
+        net = layers.Dropout(0.2)(net)
+
 
         # Add final output layer to prduce action values (Q values)
         Q_values = layers.Dense(units=1, name='q_values')(net)
@@ -48,7 +57,7 @@ class Critic:
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
 
         # Define optimizer and compile model for training with built-in loss function
-        optimizer = optimizers.Adam()
+        optimizer = optimizers.Adam(lr=self.learning_rate)
         self.model.compile(optimizer=optimizer, loss='mse')
 
         # Compute action gradients (derivative of Q values w.r.t. to actions)
