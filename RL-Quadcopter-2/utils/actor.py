@@ -22,6 +22,7 @@ class Actor:
 
         # Initialize any other variables here
         self.learning_rate = 0.001
+        self.alpha = 0.2
 
         self.build_model()
 
@@ -37,10 +38,10 @@ class Actor:
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
         net = layers.Dense(units=400)(states)
-        net = layers.LeakyReLU(alpha=0.2)(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
         
         net = layers.Dense(units=300)(net)
-        net = layers.LeakyReLU(alpha=0.2)(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
         net = layers.normalization.BatchNormalization()(net)
         net = layers.Dropout(0.2)(net)
 #        

@@ -16,7 +16,8 @@ class Critic:
         self.action_size = action_size
 
         # Initialize any other variables here
-        self.learning_rate = 0.001
+        self.learning_rate = 0.001 # for ADAM
+        self.alpha = 0.2 # for leaky-relu
 
         self.build_model()
 
@@ -27,25 +28,31 @@ class Critic:
         actions = layers.Input(shape=(self.action_size,), name='actions')
 
         # Add hidden layer(s) for state pathway
-        net_states = layers.Dense(units=32, activation='relu')(states)
-        net_states = layers.Dense(units=64, activation='relu')(net_states)
+        net_states = layers.Dense(units=32)(states)
+        net_states = layers.LeakyReLU(alpha=self.alpha)(net_states)
+        
+        net_states = layers.Dense(units=64)(net_states)
+        net_states = layers.LeakyReLU(alpha=self.alpha)(net_states)
 
         # Add hidden layer(s) for action pathway
-        net_actions = layers.Dense(units=32, activation='relu')(actions)
-        net_actions = layers.Dense(units=64, activation='relu')(net_actions)
+        net_actions = layers.Dense(units=32)(actions)
+        net_actions = layers.LeakyReLU(alpha=self.alpha)(net_actions)
+        
+        net_actions = layers.Dense(units=64)(net_actions)
+        net_actions = layers.LeakyReLU(alpha=self.alpha)(net_actions)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
 
         # Combine state and action pathways
         net = layers.Add()([net_states, net_actions])
-        net = layers.Activation('relu')(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
 
         # Add more layers to the combined network if needed
         net = layers.Dense(units=400)(net)
-        net = layers.LeakyReLU(alpha=0.2)(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
         
         net = layers.Dense(units=300)(net)
-        net = layers.LeakyReLU(alpha=0.2)(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
         net = layers.normalization.BatchNormalization()(net)
         net = layers.Dropout(0.2)(net)
 

@@ -23,11 +23,22 @@ class Task():
         self.action_size = 4
 
         # Goal
-        self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.]) 
-
+        self.start_state = self.get_sim_state()
+        self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.])
+                    
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        reward = 1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
+        def bound_val(val, coef, min_val, max_val):
+            return coef * np.clip(val, min_val, max_val)
+        
+        reward_goal =  1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum() # goal position
+        reward_no_roll  = -abs(self.sim.pose[3])  # no roll
+        reward_no_pitch = -abs(self.sim.pose[4])  # no pitch
+        
+        reward = bound_val(reward_no_roll, 1, -1, 0) \
+            + bound_val(reward_no_pitch, 1, -1, 0) \
+            + bound_val(reward_goal, 1, -3, 0)
+
         return reward
 
     def get_sim_state(self):
@@ -47,5 +58,6 @@ class Task():
     def reset(self):
         """Reset the sim to start a new episode."""
         self.sim.reset()
+        self.start_state = self.get_sim_state()
         state = np.concatenate([self.get_sim_state()] * self.action_repeat) 
         return state
