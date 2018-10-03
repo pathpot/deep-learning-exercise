@@ -62,12 +62,17 @@ class DDPG():
         # Roll over last state and action
         self.last_state = next_state
 
-    def act(self, state):
+    def act(self, state, enable_exploration):
         """Returns actions for given state(s) as per current policy."""
         state = np.reshape(state, [-1, self.state_size])
         action = self.actor_local.model.predict(state)[0]
-        return list(action + self.noise.sample())  # add some noise for exploration
-
+        
+        noise = np.zeros(self.action_size)
+        if(enable_exploration):
+            noise = self.noise.sample()
+   
+        return list(action + noise)
+    
     def learn(self, experiences):
         """Update policy and value parameters using given batch of experience tuples."""
         # Convert experience tuples to separate arrays for each element (states, actions, rewards, etc.)

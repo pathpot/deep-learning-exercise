@@ -13,5 +13,5 @@ class DDPG_Agent():
     def step(self, action, reward, next_state, done):
         self.ddpg.step(action, reward, next_state, done)
     
-    def act(self, state):
-        return self.ddpg.act(state)
+    def act(self, state, enable_exploration = True):
+        return self.ddpg.act(state, enable_exploration)
