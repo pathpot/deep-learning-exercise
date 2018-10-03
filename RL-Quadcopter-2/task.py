@@ -17,8 +17,7 @@ class Task():
         # Simulation
         self.sim = PhysicsSim(init_pose, init_velocities, init_angle_velocities, runtime) 
         self.action_repeat = 3
-
-        self.state_size = self.action_repeat * 6
+        self.state_size = self.action_repeat * self.get_sim_state().shape[0]
         self.action_low = 0
         self.action_high = 900
         self.action_size = 4
@@ -31,19 +30,22 @@ class Task():
         reward = 1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
         return reward
 
+    def get_sim_state(self):
+        return np.hstack([self.sim.pose, self.sim.v, self.sim.angular_v])
+    
     def step(self, rotor_speeds):
         """Uses action to obtain next state, reward, done."""
         reward = 0
         pose_all = []
         for _ in range(self.action_repeat):
             done = self.sim.next_timestep(rotor_speeds) # update the sim pose and velocities
-            reward += self.get_reward() 
-            pose_all.append(self.sim.pose)
+            reward += self.get_reward()   
+            pose_all.append(self.get_sim_state())
         next_state = np.concatenate(pose_all)
         return next_state, reward, done
 
     def reset(self):
         """Reset the sim to start a new episode."""
         self.sim.reset()
-        state = np.concatenate([self.sim.pose] * self.action_repeat) 
+        state = np.concatenate([self.get_sim_state()] * self.action_repeat) 
         return state
