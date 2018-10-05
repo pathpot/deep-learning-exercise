@@ -23,6 +23,7 @@ class Actor:
         # Initialize any other variables here
         self.learning_rate = 0.001
         self.alpha = 0.2
+        self.drop_prob = 0.5
 
         self.build_model()
 
@@ -43,17 +44,17 @@ class Actor:
         net = layers.Dense(units=64)(net)
         net = layers.normalization.BatchNormalization()(net)
         net = layers.LeakyReLU(alpha=self.alpha)(net)
-        net = layers.Dropout(0.2)(net)
+        net = layers.Dropout(self.drop_prob)(net)
 
         net = layers.Dense(units=128)(net)
         net = layers.normalization.BatchNormalization()(net)
         net = layers.LeakyReLU(alpha=self.alpha)(net)
-        net = layers.Dropout(0.2)(net)
+        net = layers.Dropout(self.drop_prob)(net)
 
         net = layers.Dense(units=256)(net)
         net = layers.normalization.BatchNormalization()(net)
         net = layers.LeakyReLU(alpha=self.alpha)(net)
-        net = layers.Dropout(0.2)(net)
+        net = layers.Dropout(self.drop_prob)(net)
 
         #        
 #        net = layers.Dense(units=128)(net)

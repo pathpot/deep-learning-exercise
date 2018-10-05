@@ -18,6 +18,7 @@ class Critic:
         # Initialize any other variables here
         self.learning_rate = 0.001 # for ADAM
         self.alpha = 0.2 # for leaky-relu
+        self.drop_prob = 0.5
 
         self.build_model()
 
@@ -53,11 +54,12 @@ class Critic:
         net = layers.Dense(units=128)(net)
         net = layers.normalization.BatchNormalization()(net) 
         net = layers.LeakyReLU(alpha=self.alpha)(net)
+        net = layers.Dropout(self.drop_prob)(net)
         
         net = layers.Dense(units=256)(net)
         net = layers.normalization.BatchNormalization()(net)        
         net = layers.LeakyReLU(alpha=self.alpha)(net)
-        net = layers.Dropout(0.2)(net)
+        net = layers.Dropout(self.drop_prob)(net)
 
 
         # Add final output layer to prduce action values (Q values)
