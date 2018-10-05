@@ -32,6 +32,7 @@ class Critic:
         net_states = layers.LeakyReLU(alpha=self.alpha)(net_states)
         
         net_states = layers.Dense(units=64)(net_states)
+        net_states = layers.normalization.BatchNormalization()(net_states)
         net_states = layers.LeakyReLU(alpha=self.alpha)(net_states)
 
         # Add hidden layer(s) for action pathway
@@ -39,6 +40,7 @@ class Critic:
         net_actions = layers.LeakyReLU(alpha=self.alpha)(net_actions)
         
         net_actions = layers.Dense(units=64)(net_actions)
+        net_actions = layers.normalization.BatchNormalization()(net_actions)
         net_actions = layers.LeakyReLU(alpha=self.alpha)(net_actions)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
@@ -48,12 +50,13 @@ class Critic:
         net = layers.LeakyReLU(alpha=self.alpha)(net)
 
         # Add more layers to the combined network if needed
-        net = layers.Dense(units=400)(net)
+        net = layers.Dense(units=128)(net)
+        net = layers.normalization.BatchNormalization()(net) 
         net = layers.LeakyReLU(alpha=self.alpha)(net)
         
-        net = layers.Dense(units=300)(net)
+        net = layers.Dense(units=256)(net)
+        net = layers.normalization.BatchNormalization()(net)        
         net = layers.LeakyReLU(alpha=self.alpha)(net)
-        net = layers.normalization.BatchNormalization()(net)
         net = layers.Dropout(0.2)(net)
 
 
@@ -74,3 +77,9 @@ class Critic:
         self.get_action_gradients = K.function(
             inputs=[*self.model.input, K.learning_phase()],
             outputs=action_gradients)
+        
+    def load_model(self, filename):
+        self.model.load_weights(filename)
+        
+    def save_model(self, filename):
+        self.model.save_weights(filename)

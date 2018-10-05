@@ -37,14 +37,25 @@ class Actor:
 #        net = layers.Dense(units=32, activation='relu')(net)
 
         # Try different layer sizes, activations, add batch normalization, regularizers, etc.
-        net = layers.Dense(units=400)(states)
+        net = layers.Dense(units=32)(states)
         net = layers.LeakyReLU(alpha=self.alpha)(net)
         
-        net = layers.Dense(units=300)(net)
-        net = layers.LeakyReLU(alpha=self.alpha)(net)
+        net = layers.Dense(units=64)(net)
         net = layers.normalization.BatchNormalization()(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
         net = layers.Dropout(0.2)(net)
-#        
+
+        net = layers.Dense(units=128)(net)
+        net = layers.normalization.BatchNormalization()(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
+        net = layers.Dropout(0.2)(net)
+
+        net = layers.Dense(units=256)(net)
+        net = layers.normalization.BatchNormalization()(net)
+        net = layers.LeakyReLU(alpha=self.alpha)(net)
+        net = layers.Dropout(0.2)(net)
+
+        #        
 #        net = layers.Dense(units=128)(net)
 #        net = layers.LeakyReLU(alpha=0.2)(net)
 #        net = layers.normalization.BatchNormalization()(net)
@@ -57,7 +68,7 @@ class Actor:
         # Scale [0, 1] output for each action dimension to proper range
         actions = layers.Lambda(lambda x: (x * self.action_range) + self.action_low,
             name='actions')(raw_actions)
-
+        
         # Create Keras model
         self.model = models.Model(inputs=states, outputs=actions)
 
@@ -74,3 +85,9 @@ class Actor:
             inputs=[self.model.input, action_gradients, K.learning_phase()],
             outputs=[],
             updates=updates_op)
+        
+    def load_model(self, filename):
+        self.model.load_weights(filename)
+        
+    def save_model(self, filename):
+        self.model.save_weights(filename)

@@ -31,13 +31,18 @@ class Task():
         def bound_val(val, coef, min_val, max_val):
             return coef * np.clip(val, min_val, max_val)
         
-        reward_goal =  1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum() # goal position
-        reward_no_roll  = -abs(self.sim.pose[3])  # no roll
-        reward_no_pitch = -abs(self.sim.pose[4])  # no pitch
+        #reward_goal =  1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum() # goal position        
+
+        reward_no_roll  = -np.power(self.sim.pose[3], 2)  # no roll        
+        reward_no_pitch = -np.power(self.sim.pose[4], 2)  # no pitch
         
-        reward = bound_val(reward_no_roll, 1, -1, 0) \
-            + bound_val(reward_no_pitch, 1, -1, 0) \
-            + bound_val(reward_goal, 1, -3, 0)
+        reward_no_xy_v = -np.power(self.sim.v[:2], 2).sum() / 30 # no xy velocity
+        reward_z_v = self.sim.v[2]
+        
+        reward = bound_val(reward_no_xy_v, 1, -1, 0) \
+            + bound_val(reward_z_v, 1, 0, 10) \
+            + bound_val(reward_no_roll, 5, -1, 0) \
+            + bound_val(reward_no_pitch, 5, -1, 0)
 
         return reward
 
