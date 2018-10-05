@@ -12,6 +12,7 @@ class DDPG():
         self.action_size = task.action_size
         self.action_low = task.action_low
         self.action_high = task.action_high
+        self.action_range = self.action_high - self.action_low
 
         # Actor (Policy) Model
         self.actor_local = Actor(self.state_size, self.action_size, self.action_low, self.action_high)
@@ -28,7 +29,7 @@ class DDPG():
         # Noise process
         self.exploration_mu = 0
         self.exploration_theta = 0.15
-        self.exploration_sigma = 0.2
+        self.exploration_sigma = 0.2 * (self.action_range * 0.1)
         self.noise = OUNoise(self.action_size, self.exploration_mu, self.exploration_theta, self.exploration_sigma)
 
         # Replay memory
